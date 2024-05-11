@@ -90,43 +90,43 @@ const close = () => {
   </div>
   <a-modal v-model:open="open" :title="null" :closable="false" :destroy-on-close="true">
     <a-tabs v-model:activeKey="activeKey">
-<!--      <a-tab-pane key="upload" :tab="t('TXT_CODE_e00c858c')">-->
-<!--        <a-progress-->
-<!--            v-if="percentComplete > 0"-->
-<!--            :stroke-color="{-->
-<!--            '0%': '#49b3ff',-->
-<!--            '100%': '#25f5b9'-->
-<!--          }"-->
-<!--            :percent="percentComplete"-->
-<!--            class="mb-20"-->
-<!--        />-->
+      <a-tab-pane key="upload" :tab="t('TXT_CODE_e00c858c')">
+        <a-progress
+            v-if="percentComplete > 0"
+            :stroke-color="{
+            '0%': '#49b3ff',
+            '100%': '#25f5b9'
+          }"
+            :percent="percentComplete"
+            class="mb-20"
+        />
 
-<!--        <a-upload-->
-<!--            :max-count="1"-->
-<!--            :disabled="percentComplete > 0"-->
-<!--            :show-upload-list="false"-->
-<!--            :before-upload="beforeUpload"-->
-<!--        >-->
-<!--          <a-button type="primary" :loading="percentComplete > 0">-->
-<!--            <upload-outlined v-if="percentComplete === 0"/>-->
-<!--            {{-->
-<!--              percentComplete > 0-->
-<!--                  ? t("TXT_CODE_b625dbf0") + percentComplete + "%"-->
-<!--                  : t("TXT_CODE_e00c858c")-->
-<!--            }}-->
-<!--          </a-button>-->
-<!--        </a-upload>-->
-<!--        <a-typography class="mt-20">-->
-<!--          <a-typography-title :level="5">{{ t("TXT_CODE_e112412a") }}</a-typography-title>-->
-<!--          <a-typography-paragraph>-->
-<!--            <ol>-->
-<!--              <li>{{ t("TXT_CODE_2bcc4e34") }}</li>-->
-<!--              <li>{{ t("TXT_CODE_498cd5c5") }}</li>-->
-<!--              <li>{{ t("TXT_CODE_c1320e08") }}</li>-->
-<!--            </ol>-->
-<!--          </a-typography-paragraph>-->
-<!--        </a-typography>-->
-<!--      </a-tab-pane>-->
+        <a-upload
+            :max-count="1"
+            :disabled="percentComplete > 0"
+            :show-upload-list="false"
+            :before-upload="beforeUpload"
+        >
+          <a-button type="primary" :loading="percentComplete > 0">
+            <upload-outlined v-if="percentComplete === 0"/>
+            {{
+              percentComplete > 0
+                  ? t("TXT_CODE_b625dbf0") + percentComplete + "%"
+                  : t("TXT_CODE_e00c858c")
+            }}
+          </a-button>
+        </a-upload>
+        <a-typography class="mt-20">
+          <a-typography-title :level="5">{{ t("TXT_CODE_e112412a") }}</a-typography-title>
+          <a-typography-paragraph>
+            <ol>
+              <li>{{ t("TXT_CODE_2bcc4e34") }}</li>
+              <li>{{ t("TXT_CODE_498cd5c5") }}</li>
+              <li>{{ t("TXT_CODE_c1320e08") }}</li>
+            </ol>
+          </a-typography-paragraph>
+        </a-typography>
+      </a-tab-pane>
       <a-tab-pane key="url" :tab="t('TXT_CODE_ba42d467')" force-render>
         <a-input v-model:value.lazy.trim="imgSrc" autofocus :placeholder="t('TXT_CODE_c8a51b2e')"/>
       </a-tab-pane>
