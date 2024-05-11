@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { t } from "@/lang/i18n";
-import { useLayoutContainerStore } from "@/stores/useLayoutContainerStore";
+import {ref} from "vue";
+import {t} from "@/lang/i18n";
+import {useLayoutContainerStore} from "@/stores/useLayoutContainerStore";
 import CardPanel from "@/components/CardPanel.vue";
-import type { LayoutCard } from "@/types/index";
-import { Empty, message, type UploadProps } from "ant-design-vue";
-import { UploadOutlined } from "@ant-design/icons-vue";
-import { useLayoutCardTools } from "@/hooks/useCardTools";
-import { uploadFile } from "@/services/apis/layout";
-import { useAppStateStore } from "@/stores/useAppStateStore";
+import type {LayoutCard} from "@/types/index";
+import {Empty, message, type UploadProps} from "ant-design-vue";
+import {UploadOutlined} from "@ant-design/icons-vue";
+import {useLayoutCardTools} from "@/hooks/useCardTools";
+import {uploadFile} from "@/services/apis/layout";
+import {useAppStateStore} from "@/stores/useAppStateStore";
 
 const props = defineProps<{
   card: LayoutCard;
 }>();
 
-const { getMetaValue, setMetaValue } = useLayoutCardTools(props.card);
-const { containerState } = useLayoutContainerStore();
-const { isAdmin } = useAppStateStore();
+const {getMetaValue, setMetaValue} = useLayoutCardTools(props.card);
+const {containerState} = useLayoutContainerStore();
+const {isAdmin} = useAppStateStore();
 const imgSrc = ref(getMetaValue("image", ""));
 const open = ref(false);
 const activeKey = ref("upload");
 const percentComplete = ref(0);
 const uploadControl = new AbortController();
 
-const { state, execute } = uploadFile();
+const {state, execute} = uploadFile();
 const beforeUpload: UploadProps["beforeUpload"] = async (file) => {
   const uploadFormData = new FormData();
   uploadFormData.append("file", file);
@@ -70,7 +70,7 @@ const close = () => {
         {{ t("TXT_CODE_fd13f431") }}
       </a-button>
     </div>
-    <img v-if="imgSrc !== ''" class="global-card-container-shadow" :src="imgSrc" />
+    <img v-if="imgSrc !== ''" class="global-card-container-shadow" :src="imgSrc"/>
     <CardPanel v-else style="height: 100%">
       <template #body>
         <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE">
@@ -78,9 +78,9 @@ const close = () => {
             <span>{{ t("TXT_CODE_635d051") }}</span>
           </template>
           <a-button
-            :disabled="!containerState.isDesignMode || !isAdmin"
-            type="primary"
-            @click="editImgSrc()"
+              :disabled="!containerState.isDesignMode || !isAdmin"
+              type="primary"
+              @click="editImgSrc()"
           >
             {{ t("TXT_CODE_589e091c") }}
           </a-button>
@@ -90,45 +90,45 @@ const close = () => {
   </div>
   <a-modal v-model:open="open" :title="null" :closable="false" :destroy-on-close="true">
     <a-tabs v-model:activeKey="activeKey">
-      <a-tab-pane key="upload" :tab="t('TXT_CODE_e00c858c')">
-        <a-progress
-          v-if="percentComplete > 0"
-          :stroke-color="{
-            '0%': '#49b3ff',
-            '100%': '#25f5b9'
-          }"
-          :percent="percentComplete"
-          class="mb-20"
-        />
+<!--      <a-tab-pane key="upload" :tab="t('TXT_CODE_e00c858c')">-->
+<!--        <a-progress-->
+<!--            v-if="percentComplete > 0"-->
+<!--            :stroke-color="{-->
+<!--            '0%': '#49b3ff',-->
+<!--            '100%': '#25f5b9'-->
+<!--          }"-->
+<!--            :percent="percentComplete"-->
+<!--            class="mb-20"-->
+<!--        />-->
 
-        <a-upload
-          :max-count="1"
-          :disabled="percentComplete > 0"
-          :show-upload-list="false"
-          :before-upload="beforeUpload"
-        >
-          <a-button type="primary" :loading="percentComplete > 0">
-            <upload-outlined v-if="percentComplete === 0" />
-            {{
-              percentComplete > 0
-                ? t("TXT_CODE_b625dbf0") + percentComplete + "%"
-                : t("TXT_CODE_e00c858c")
-            }}
-          </a-button>
-        </a-upload>
-        <a-typography class="mt-20">
-          <a-typography-title :level="5">{{ t("TXT_CODE_e112412a") }}</a-typography-title>
-          <a-typography-paragraph>
-            <ol>
-              <li>{{ t("TXT_CODE_2bcc4e34") }}</li>
-              <li>{{ t("TXT_CODE_498cd5c5") }}</li>
-              <li>{{ t("TXT_CODE_c1320e08") }}</li>
-            </ol>
-          </a-typography-paragraph>
-        </a-typography>
-      </a-tab-pane>
+<!--        <a-upload-->
+<!--            :max-count="1"-->
+<!--            :disabled="percentComplete > 0"-->
+<!--            :show-upload-list="false"-->
+<!--            :before-upload="beforeUpload"-->
+<!--        >-->
+<!--          <a-button type="primary" :loading="percentComplete > 0">-->
+<!--            <upload-outlined v-if="percentComplete === 0"/>-->
+<!--            {{-->
+<!--              percentComplete > 0-->
+<!--                  ? t("TXT_CODE_b625dbf0") + percentComplete + "%"-->
+<!--                  : t("TXT_CODE_e00c858c")-->
+<!--            }}-->
+<!--          </a-button>-->
+<!--        </a-upload>-->
+<!--        <a-typography class="mt-20">-->
+<!--          <a-typography-title :level="5">{{ t("TXT_CODE_e112412a") }}</a-typography-title>-->
+<!--          <a-typography-paragraph>-->
+<!--            <ol>-->
+<!--              <li>{{ t("TXT_CODE_2bcc4e34") }}</li>-->
+<!--              <li>{{ t("TXT_CODE_498cd5c5") }}</li>-->
+<!--              <li>{{ t("TXT_CODE_c1320e08") }}</li>-->
+<!--            </ol>-->
+<!--          </a-typography-paragraph>-->
+<!--        </a-typography>-->
+<!--      </a-tab-pane>-->
       <a-tab-pane key="url" :tab="t('TXT_CODE_ba42d467')" force-render>
-        <a-input v-model:value.lazy.trim="imgSrc" autofocus :placeholder="t('TXT_CODE_c8a51b2e')" />
+        <a-input v-model:value.lazy.trim="imgSrc" autofocus :placeholder="t('TXT_CODE_c8a51b2e')"/>
       </a-tab-pane>
     </a-tabs>
     <template #footer>
@@ -150,11 +150,13 @@ img {
   object-fit: cover;
   aspect-ratio: 16/9;
 }
+
 .app-dark-theme {
   img {
     filter: brightness(0.7);
   }
 }
+
 .mask {
   position: absolute;
   z-index: 1;

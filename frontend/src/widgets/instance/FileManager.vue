@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import CardPanel from "@/components/CardPanel.vue";
-import type { LayoutCard } from "@/types/index";
-import { ref, computed, onMounted, onUnmounted, h, type CSSProperties } from "vue";
-import { getCurrentLang, t } from "@/lang/i18n";
-import { convertFileSize } from "@/tools/fileSize";
+import type {LayoutCard} from "@/types/index";
+import {computed, type CSSProperties, h, onMounted, onUnmounted, ref} from "vue";
+import {getCurrentLang, t} from "@/lang/i18n";
+import {convertFileSize} from "@/tools/fileSize";
 import dayjs from "dayjs";
 import {
   CopyOutlined,
   DeleteOutlined,
   DownOutlined,
-  DownloadOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
   FileOutlined,
@@ -23,26 +22,26 @@ import {
   UploadOutlined
 } from "@ant-design/icons-vue";
 import BetweenMenus from "@/components/BetweenMenus.vue";
-import { useScreen } from "@/hooks/useScreen";
-import { arrayFilter } from "@/tools/array";
-import { useLayoutCardTools } from "@/hooks/useCardTools";
-import { filterFileName, getFileExtName, getFileIcon } from "@/tools/fileManager";
-import { useFileManager } from "@/hooks/useFileManager";
+import {useScreen} from "@/hooks/useScreen";
+import {arrayFilter} from "@/tools/array";
+import {useLayoutCardTools} from "@/hooks/useCardTools";
+import {filterFileName, getFileIcon} from "@/tools/fileManager";
+import {useFileManager} from "@/hooks/useFileManager";
 import FileEditor from "./dialogs/FileEditor.vue";
-import type { DataType } from "@/types/fileManager";
-import type { AntColumnsType } from "@/types/ant";
-import { useRightClickMenu } from "../../hooks/useRightClickMenu";
-import { message, type ItemType, Modal } from "ant-design-vue";
+import type {DataType} from "@/types/fileManager";
+import type {AntColumnsType} from "@/types/ant";
+import {useRightClickMenu} from "../../hooks/useRightClickMenu";
+import {type ItemType, message, Modal} from "ant-design-vue";
 
 const props = defineProps<{
   card: LayoutCard;
 }>();
 
-const { getMetaOrRouteValue } = useLayoutCardTools(props.card);
+const {getMetaOrRouteValue} = useLayoutCardTools(props.card);
 const instanceId = getMetaOrRouteValue("instanceId");
 const daemonId = getMetaOrRouteValue("daemonId");
 
-const { isPhone } = useScreen();
+const {isPhone} = useScreen();
 
 const {
   dialog,
@@ -68,7 +67,7 @@ const {
   zipFile,
   unzipFile,
   beforeUpload,
-  downloadFile,
+  // downloadFile,
   handleChangeDir,
   selectedFile,
   rowClickTable,
@@ -79,13 +78,13 @@ const {
   oneSelected
 } = useFileManager(instanceId, daemonId);
 
-const { openRightClickMenu } = useRightClickMenu();
+const {openRightClickMenu} = useRightClickMenu();
 
 const isShowDiskList = computed(
-  () =>
-    fileStatus.value?.disks.length &&
-    fileStatus.value?.platform === "win32" &&
-    fileStatus.value?.isGlobalInstance
+    () =>
+        fileStatus.value?.disks.length &&
+        fileStatus.value?.platform === "win32" &&
+        fileStatus.value?.isGlobalInstance
 );
 
 const columns = computed(() => {
@@ -114,7 +113,7 @@ const columns = computed(() => {
       dataIndex: "size",
       key: "size",
       customRender: (e: { text: number }) =>
-        e.text == 0 ? "--" : convertFileSize(e.text.toString()),
+          e.text == 0 ? "--" : convertFileSize(e.text.toString()),
       minWidth: 200,
       condition: () => !isPhone.value
     },
@@ -185,96 +184,100 @@ const handleDrop = (e: DragEvent) => {
 };
 
 const editFile = (fileName: string) => {
+  // 如果结尾不是yml 不能编辑
+  if (!fileName.endsWith(".yml")) {
+    return message.error(t("TXT_CODE_7b3b3b7d"));
+  }
   const path = breadcrumbs[breadcrumbs.length - 1].path + fileName;
   FileEditorDialog.value?.openDialog(path, fileName);
 };
 
 const menuList = (record: DataType) =>
-  arrayFilter<ItemType & { style?: CSSProperties }>([
-    {
-      label: t("TXT_CODE_b147fabc"),
-      key: "new",
-      icon: h(PlusOutlined),
-      children: [
-        {
-          label: t("TXT_CODE_cfc657db"),
-          key: "newFolder",
-          icon: h(FolderOutlined),
-          onClick: () => touchFile(true)
-        },
-        {
-          label: t("TXT_CODE_1e0b63b6"),
-          key: "newFile",
-          icon: h(FileOutlined),
-          onClick: () => touchFile()
-        }
-      ],
-      condition: () => !isMultiple.value
-    },
-    {
-      label: t("TXT_CODE_88122886"),
-      key: "zip",
-      icon: h(FileZipOutlined),
-      onClick: () => zipFile(),
-      condition: () => !!isMultiple.value
-    },
-    {
-      label: t("TXT_CODE_a64f3007"),
-      key: "unzip",
-      icon: h(FileZipOutlined),
-      onClick: () => unzipFile(record.name),
-      condition: () => record.type === 1 && getFileExtName(record.name) === "zip"
-    },
-    {
-      label: t("TXT_CODE_ad207008"),
-      key: "edit",
-      icon: h(EditOutlined),
-      onClick: () => editFile(record.name),
-      condition: () => !isMultiple.value && record.type === 1
-    },
-    {
-      label: t("TXT_CODE_65b21404"),
-      key: "download",
-      icon: h(DownloadOutlined),
-      onClick: () => downloadFile(record.name),
-      condition: () => !isMultiple.value && record.type === 1
-    },
-    {
-      label: t("TXT_CODE_46c4169b"),
-      key: "cut",
-      icon: h(ScissorOutlined),
-      onClick: () => setClipBoard("move")
-    },
-    {
-      label: t("TXT_CODE_13ae6a93"),
-      key: "copy",
-      icon: h(CopyOutlined),
-      onClick: () => setClipBoard("copy")
-    },
-    {
-      label: t("TXT_CODE_c83551f5"),
-      key: "rename",
-      icon: h(FormOutlined),
-      onClick: () => resetName(record.name),
-      condition: () => !isMultiple.value
-    },
-    {
-      label: t("TXT_CODE_16853efe"),
-      key: "changePermission",
-      icon: h(KeyOutlined),
-      onClick: () => changePermission(record.name, record.mode),
-      condition: () => !isMultiple.value && fileStatus.value?.platform !== "win32"
-    },
-    {
-      label: t("TXT_CODE_ecbd7449"),
-      key: "delete",
-      icon: h(DeleteOutlined),
-      style: {
-        color: "var(--color-red-5)"
+    arrayFilter<ItemType & { style?: CSSProperties }>([
+      // {
+      //   label: t("TXT_CODE_b147fabc"),
+      //   key: "new",
+      //   icon: h(PlusOutlined),
+      //   children: [
+      //     {
+      //       label: t("TXT_CODE_cfc657db"),
+      //       key: "newFolder",
+      //       icon: h(FolderOutlined),
+      //       onClick: () => touchFile(true)
+      //     },
+      //     {
+      //       label: t("TXT_CODE_1e0b63b6"),
+      //       key: "newFile",
+      //       icon: h(FileOutlined),
+      //       onClick: () => touchFile()
+      //     }
+      //   ],
+      //   condition: () => !isMultiple.value
+      // },
+      // {
+      //   label: t("TXT_CODE_88122886"),
+      //   key: "zip",
+      //   icon: h(FileZipOutlined),
+      //   onClick: () => zipFile(),
+      //   condition: () => !!isMultiple.value
+      // },
+      // {
+      //   label: t("TXT_CODE_a64f3007"),
+      //   key: "unzip",
+      //   icon: h(FileZipOutlined),
+      //   onClick: () => unzipFile(record.name),
+      //   condition: () => record.type === 1 && getFileExtName(record.name) === "zip"
+      // },
+      {
+        label: t("TXT_CODE_ad207008"),
+        key: "edit",
+        icon: h(EditOutlined),
+        onClick: () => editFile(record.name),
+        condition: () => !isMultiple.value && record.type === 1 && record.name.endsWith(".yaml")
       },
-      onClick: () => deleteFile(record.name)
-    }
-  ]);
+      // {
+      //   label: t("TXT_CODE_65b21404"),
+      //   key: "download",
+      //   icon: h(DownloadOutlined),
+      //   onClick: () => downloadFile(record.name),
+      //   condition: () => !isMultiple.value && record.type === 1
+      // },
+      // {
+      //   label: t("TXT_CODE_46c4169b"),
+      //   key: "cut",
+      //   icon: h(ScissorOutlined),
+      //   onClick: () => setClipBoard("move")
+      // },
+      // {
+      //   label: t("TXT_CODE_13ae6a93"),
+      //   key: "copy",
+      //   icon: h(CopyOutlined),
+      //   onClick: () => setClipBoard("copy")
+      // },
+      // {
+      //   label: t("TXT_CODE_c83551f5"),
+      //   key: "rename",
+      //   icon: h(FormOutlined),
+      //   onClick: () => resetName(record.name),
+      //   condition: () => !isMultiple.value
+      // },
+      // {
+      //   label: t("TXT_CODE_16853efe"),
+      //   key: "changePermission",
+      //   icon: h(KeyOutlined),
+      //   onClick: () => changePermission(record.name, record.mode),
+      //   condition: () => !isMultiple.value && fileStatus.value?.platform !== "win32"
+      // },
+      // {
+      //   label: t("TXT_CODE_ecbd7449"),
+      //   key: "delete",
+      //   icon: h(DeleteOutlined),
+      //   style: {
+      //     color: "var(--color-red-5)"
+      //   },
+      //   onClick: () => deleteFile(record.name)
+      // }
+    ]);
 
 const handleRightClickRow = (e: MouseEvent, record: DataType) => {
   e.preventDefault();
@@ -309,25 +312,25 @@ onUnmounted(() => {
           </template>
           <template #right>
             <a-upload
-              :before-upload="beforeUpload"
-              :max-count="1"
-              :disabled="percentComplete > 0"
-              :show-upload-list="false"
+                :before-upload="beforeUpload"
+                :max-count="1"
+                :disabled="percentComplete > 0"
+                :show-upload-list="false"
             >
               <a-button type="dashed" :loading="percentComplete > 0">
-                <upload-outlined v-if="percentComplete === 0" />
+                <upload-outlined v-if="percentComplete === 0"/>
                 {{
                   percentComplete > 0
-                    ? t("TXT_CODE_b625dbf0") + percentComplete + "%"
-                    : t("TXT_CODE_e00c858c")
+                      ? t("TXT_CODE_b625dbf0") + percentComplete + "%"
+                      : t("TXT_CODE_e00c858c")
                 }}
               </a-button>
             </a-upload>
             <a-button
-              v-if="clipboard?.value && clipboard.value.length > 0"
-              type="dashed"
-              danger
-              @click="paste()"
+                v-if="clipboard?.value && clipboard.value.length > 0"
+                type="dashed"
+                danger
+                @click="paste()"
             >
               {{ t("TXT_CODE_f0260e51") }}
             </a-button>
@@ -338,8 +341,8 @@ onUnmounted(() => {
             <a-dropdown v-if="isMultiple">
               <template #overlay>
                 <a-menu
-                  mode="vertical"
-                  :items="
+                    mode="vertical"
+                    :items="
                     menuList({
                       name: '',
                       type: 0,
@@ -353,7 +356,7 @@ onUnmounted(() => {
               </template>
               <a-button type="primary">
                 {{ t("TXT_CODE_5cb656b9") }}
-                <DownOutlined />
+                <DownOutlined/>
               </a-button>
             </a-dropdown>
 
@@ -370,20 +373,20 @@ onUnmounted(() => {
               </template>
               <a-button type="primary">
                 {{ t("TXT_CODE_b147fabc") }}
-                <DownOutlined />
+                <DownOutlined/>
               </a-button>
             </a-dropdown>
           </template>
           <template #center>
             <div class="search-input">
               <a-input
-                v-model:value.trim.lazy="operationForm.name"
-                :placeholder="t('TXT_CODE_7cad42a5')"
-                allow-clear
-                @change="getFileList()"
+                  v-model:value.trim.lazy="operationForm.name"
+                  :placeholder="t('TXT_CODE_7cad42a5')"
+                  allow-clear
+                  @change="getFileList()"
               >
                 <template #suffix>
-                  <search-outlined />
+                  <search-outlined/>
                 </template>
               </a-input>
             </div>
@@ -393,29 +396,29 @@ onUnmounted(() => {
 
       <a-col :span="24">
         <CardPanel
-          style="height: 100%"
-          :style="opacity && 'opacity: 0.4'"
-          @dragover="handleDragover"
-          @dragleave="handleDragleave"
-          @drop="handleDrop"
+            style="height: 100%"
+            :style="opacity && 'opacity: 0.4'"
+            @dragover="handleDragover"
+            @dragleave="handleDragleave"
+            @drop="handleDrop"
         >
           <template #body>
             <a-progress
-              v-if="percentComplete > 0"
-              :stroke-color="{
+                v-if="percentComplete > 0"
+                :stroke-color="{
                 '0%': '#49b3ff',
                 '100%': '#25f5b9'
               }"
-              :percent="percentComplete"
-              class="mb-20"
+                :percent="percentComplete"
+                class="mb-20"
             />
             <div class="flex-wrap items-flex-start">
               <a-select
-                v-if="isShowDiskList"
-                v-model:value="currentDisk"
-                :class="isPhone ? 'w-100 mb-10' : 'mr-10'"
-                style="width: 125px"
-                @change="toDisk(currentDisk)"
+                  v-if="isShowDiskList"
+                  v-model:value="currentDisk"
+                  :class="isPhone ? 'w-100 mb-10' : 'mr-10'"
+                  style="width: 125px"
+                  @change="toDisk(currentDisk)"
               >
                 <a-select-option value="/">{{ t("TXT_CODE_28124988") }}</a-select-option>
                 <a-select-option v-for="disk in fileStatus?.disks" :key="disk" :value="disk">
@@ -434,49 +437,49 @@ onUnmounted(() => {
             </div>
 
             <p
-              v-if="fileStatus?.instanceFileTask && fileStatus.instanceFileTask > 0"
-              style="color: #1677ff"
+                v-if="fileStatus?.instanceFileTask && fileStatus.instanceFileTask > 0"
+                style="color: #1677ff"
             >
-              <a-spin />
+              <a-spin/>
               {{ t("TXT_CODE_dd06dea2") + fileStatus?.instanceFileTask + t("TXT_CODE_3e959ce7") }}
             </p>
             <a-spin :spinning="spinning">
               <a-table
-                :row-selection="{
+                  :row-selection="{
                   selectedRowKeys: selectedRowKeys,
                   onChange: selectChanged
                 }"
-                :row-key="(record: DataType) => record.name"
-                :data-source="dataSource"
-                :columns="columns"
-                :scroll="{
+                  :row-key="(record: DataType) => record.name"
+                  :data-source="dataSource"
+                  :columns="columns"
+                  :scroll="{
                   x: 'max-content'
                 }"
-                size="small"
-                :pagination="{
+                  size="small"
+                  :pagination="{
                   current: operationForm.current,
                   pageSize: operationForm.pageSize,
                   total: operationForm.total,
                   hideOnSinglePage: false,
                   showSizeChanger: true
                 }"
-                :custom-row="
+                  :custom-row="
                   (record: DataType) => {
                     return {
                       onContextmenu: (e: MouseEvent) => handleRightClickRow(e, record)
                     };
                   }
                 "
-                @change="
+                  @change="
                   (e) => handleTableChange({ current: e.current || 0, pageSize: e.pageSize || 0 })
                 "
               >
                 <template #bodyCell="{ column, record }">
                   <template v-if="column.key === 'name'">
                     <a-button
-                      type="link"
-                      class="file-name"
-                      @click="
+                        type="link"
+                        class="file-name"
+                        @click="
                         record.type !== 1
                           ? rowClickTable(record.name, record.type)
                           : editFile(record.name)
@@ -484,8 +487,8 @@ onUnmounted(() => {
                     >
                       <span class="mr-4">
                         <component
-                          :is="getFileIcon(record.name, record.type)"
-                          style="font-size: 16px"
+                            :is="getFileIcon(record.name, record.type)"
+                            style="font-size: 16px"
                         />
                       </span>
                       {{ record.name }}
@@ -494,27 +497,27 @@ onUnmounted(() => {
                   <template v-if="column.key === 'action'">
                     <a-dropdown v-if="isPhone">
                       <template #overlay>
-                        <a-menu mode="vertical" :items="menuList(record as DataType)"> </a-menu>
+                        <a-menu mode="vertical" :items="menuList(record as DataType)"></a-menu>
                       </template>
                       <a-button size="middle">
                         {{ t("TXT_CODE_fe731dfc") }}
-                        <DownOutlined />
+                        <DownOutlined/>
                       </a-button>
                     </a-dropdown>
                     <a-space v-else>
                       <a-tooltip
-                        v-for="(item, i) in (menuList(record as DataType) as any).filter(
+                          v-for="(item, i) in (menuList(record as DataType) as any).filter(
                           (menu: any) => !menu.children
                         )"
-                        :key="i"
-                        :title="item.label"
+                          :key="i"
+                          :title="item.label"
                       >
                         <a-button
-                          :icon="item.icon"
-                          type="text"
-                          size="small"
-                          :style="item.style"
-                          @click="item.onClick"
+                            :icon="item.icon"
+                            type="text"
+                            size="small"
+                            :style="item.style"
+                            @click="item.onClick"
                         >
                         </a-button>
                       </a-tooltip>
@@ -530,20 +533,20 @@ onUnmounted(() => {
   </div>
 
   <a-modal
-    v-model:open="dialog.show"
-    :title="dialog.title"
-    :confirm-loading="dialog.loading"
-    :style="dialog.style"
-    @ok="dialog.ok()"
-    @cancel="dialog.cancel()"
+      v-model:open="dialog.show"
+      :title="dialog.title"
+      :confirm-loading="dialog.loading"
+      :style="dialog.style"
+      @ok="dialog.ok()"
+      @cancel="dialog.cancel()"
   >
     <p>{{ dialog.info }}</p>
 
     <a-input
-      v-if="dialog.mode == ''"
-      :ref="dialog.ref"
-      v-model:value="dialog.value"
-      :placeholder="t('TXT_CODE_4ea93630')"
+        v-if="dialog.mode == ''"
+        :ref="dialog.ref"
+        v-model:value="dialog.value"
+        :placeholder="t('TXT_CODE_4ea93630')"
     />
 
     <a-space v-if="dialog.mode == 'unzip'" direction="vertical" class="w-100">
@@ -554,18 +557,18 @@ onUnmounted(() => {
       </a-radio-group>
 
       <a-input
-        v-if="dialog.unzipmode == '1'"
-        v-model:value="dialog.value"
-        :placeholder="t('TXT_CODE_377e5535')"
+          v-if="dialog.unzipmode == '1'"
+          v-model:value="dialog.value"
+          :placeholder="t('TXT_CODE_377e5535')"
       />
     </a-space>
 
     <a-space v-if="dialog.mode == 'zip'" direction="vertical" class="w-100">
       <a-input
-        :ref="dialog.ref"
-        v-model:value="dialog.value"
-        :placeholder="t('TXT_CODE_366bad15')"
-        addon-after=". zip"
+          :ref="dialog.ref"
+          v-model:value="dialog.value"
+          :placeholder="t('TXT_CODE_366bad15')"
+          addon-after=". zip"
       />
     </a-space>
 
@@ -573,9 +576,9 @@ onUnmounted(() => {
       <a-typography-title :level="5">{{ t("TXT_CODE_2841f4a") }}</a-typography-title>
       <a-typography-text v-if="getCurrentLang() == 'zh_cn'" type="secondary">
         {{ t("TXT_CODE_b278707d") }}
-        <br />
+        <br/>
         {{ t("TXT_CODE_48044fc2") }}
-        <br />
+        <br/>
         {{ t("TXT_CODE_76a82338") }}
       </a-typography-text>
       <a-radio-group v-model:value="dialog.code">
@@ -595,9 +598,9 @@ onUnmounted(() => {
       <a-spin :spinning="permission.loading">
         <div class="flex-between permission">
           <a-checkbox-group
-            v-for="item in permission.item"
-            :key="item.key"
-            v-model:value="permission.data[item.role]"
+              v-for="item in permission.item"
+              :key="item.key"
+              v-model:value="permission.data[item.role]"
           >
             <a-row class="direction-column son">
               <a-typography-text class="mb-10">
@@ -623,11 +626,11 @@ onUnmounted(() => {
   </a-modal>
 
   <FileEditor
-    v-if="daemonId && instanceId"
-    ref="FileEditorDialog"
-    :daemon-id="daemonId"
-    :instance-id="instanceId"
-    @save="getFileList"
+      v-if="daemonId && instanceId"
+      ref="FileEditorDialog"
+      :daemon-id="daemonId"
+      :instance-id="instanceId"
+      @save="getFileList"
   />
 </template>
 
@@ -640,6 +643,7 @@ onUnmounted(() => {
 
 .file-name {
   color: inherit;
+
   &:hover {
     color: #1677ff;
   }
@@ -687,6 +691,7 @@ onUnmounted(() => {
 @media (max-width: 350px) {
   .permission {
     flex-direction: column;
+
     .son {
       width: 100%;
     }

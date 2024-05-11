@@ -139,8 +139,8 @@ export const useFileManager = (instanceId?: string, daemonId?: string) => {
   const touchFile = async (dir?: boolean) => {
     clearSelected();
     const dirname = dir
-      ? await openDialog(t("TXT_CODE_6215388a"), t("TXT_CODE_1b450b79"))
-      : await openDialog(t("TXT_CODE_791c73e9"), t("TXT_CODE_59cb16ff"));
+        ? await openDialog(t("TXT_CODE_6215388a"), t("TXT_CODE_1b450b79"))
+        : await openDialog(t("TXT_CODE_791c73e9"), t("TXT_CODE_59cb16ff"));
     const execute = dir ? addFolderApi().execute : touchFileApi().execute;
 
     try {
@@ -371,8 +371,7 @@ export const useFileManager = (instanceId?: string, daemonId?: string) => {
         data: uploadFormData,
         timeout: Number.MAX_VALUE,
         url: `${parseForwardAddress(uploadCfg.value.addr, "http")}/upload/${
-          uploadCfg.value.password
-        }`,
+          uploadCfg.value.password}`,
         onUploadProgress: (progressEvent: any) => {
           const p = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           if (p >= 1) percentComplete.value = p;
@@ -436,27 +435,27 @@ export const useFileManager = (instanceId?: string, daemonId?: string) => {
     }
   };
 
-  const downloadFile = async (fileName: string) => {
-    const { state: downloadCfg, execute: getDownloadCfg } = downloadAddress();
-    try {
-      await getDownloadCfg({
-        params: {
-          file_name: breadcrumbs[breadcrumbs.length - 1].path + fileName,
-          daemonId: daemonId!,
-          uuid: instanceId!
-        }
-      });
-      if (!downloadCfg.value) throw new Error(t("TXT_CODE_6d772765"));
-      window.open(
-        `${parseForwardAddress(downloadCfg.value.addr, "http")}/download/${
-          downloadCfg.value.password
-        }/${fileName}`
-      );
-    } catch (err: any) {
-      console.error(err);
-      return reportErrorMsg(err.message);
-    }
-  };
+  // const downloadFile = async (fileName: string) => {
+  //   const { state: downloadCfg, execute: getDownloadCfg } = downloadAddress();
+  //   try {
+  //     await getDownloadCfg({
+  //       params: {
+  //         file_name: breadcrumbs[breadcrumbs.length - 1].path + fileName,
+  //         daemonId: daemonId!,
+  //         uuid: instanceId!
+  //       }
+  //     });
+  //     if (!downloadCfg.value) throw new Error(t("TXT_CODE_6d772765"));
+  //     window.open(
+  //       `${parseForwardAddress(downloadCfg.value.addr, "http")}/download/${
+  //         downloadCfg.value.password
+  //       }/${fileName}`
+  //     );
+  //   } catch (err: any) {
+  //     console.error(err);
+  //     return reportErrorMsg(err.message);
+  //   }
+  // };
 
   const handleChangeDir = async (dir: string) => {
     if (breadcrumbs.findIndex((e) => e.path === dir) === -1)
@@ -594,7 +593,7 @@ export const useFileManager = (instanceId?: string, daemonId?: string) => {
     beforeUpload,
     selectedFile,
     rowClickTable,
-    downloadFile,
+    // downloadFile,
     handleChangeDir,
     handleTableChange,
     getFileStatus,
